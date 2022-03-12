@@ -2,21 +2,35 @@
 
 namespace App\Services\InternetServiceProvider;
 
+use App\Services\InternetServiceProvider\IspOptions;
+
 class Mpt
 {
-    protected $operator = 'mpt';
+
+    protected $options;
+
+    // protected $operator = 'mpt';
     
-    protected $month = 0;
+    // protected $month = 0;
     
-    protected $monthlyFees = 200;
-    
-    public function setMonth(int $month)
-    {
-        $this->month = $month;
+    // protected $monthlyFees = 200;
+
+    public function __construct(IspOptions $options){
+        $this->options = $options;
     }
     
-    public function calculateTotalAmount()
+    // public function setMonth(int $month)
+    // {
+    //     $this->month = $month;
+    // }
+    
+    // public function calculateTotalAmount()
+    // {
+    //     return $this->month * $this->monthlyFees;
+    // }
+
+    public function diCalculateTotalAmount()
     {
-        return $this->month * $this->monthlyFees;
+        return $this->options->month * $this->options->monthlyFees;
     }
 }

@@ -2,31 +2,31 @@
 
 namespace App\Http\Controllers;
 
+use Config;
+use Illuminate\Http\Request;
+use App\Http\Requests\MptInvAmountRequest;
 use App\Services\InternetServiceProvider\Mpt;
 use App\Services\InternetServiceProvider\Ooredoo;
-use Illuminate\Http\Request;
+use App\Services\InternetServiceProvider\IspOptions;
 
 class InternetServiceProviderController extends Controller
 {
-    public function getMptInvoiceAmount(Request $request)
+    public function getMptInvoiceAmount(MptInvAmountRequest $request)
     {
-        $mpt = new Mpt();
-        $mpt->setMonth($request->get('month') ?: 1);
-        $amount = $mpt->calculateTotalAmount();
-        
+        $mpt = new Mpt(new IspOptions($request->get('month'), Config::get('constants.MPT_MONTHLY_FEE')));
+
         return response()->json([
-            'data' => $amount
+            'data' => $mpt->diCalculateTotalAmount()
         ]);
+
     }
     
     public function getOoredooInvoiceAmount(Request $request)
     {
-        $ooredoo = new Ooredoo();
-        $ooredoo->setMonth($request->get('month') ?: 1);
-        $amount = $ooredoo->calculateTotalAmount();
+        $ooredoo = new Ooredoo(new IspOptions($request->get('month'), Config::get('constants.OOREDOO_MONTHLY_FEE')));
         
         return response()->json([
-            'data' => $amount
+            'data' => $ooredoo->diCalculateTotalAmount()
         ]);
     }
 }
