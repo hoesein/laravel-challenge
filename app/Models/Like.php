@@ -13,4 +13,9 @@ class Like extends Model
         'user_id',
         'post_id'
     ];
+
+    public function likedUser()
+    {
+        return $this->hasMany(User::class, 'id', 'user_id');
+    }
 }
