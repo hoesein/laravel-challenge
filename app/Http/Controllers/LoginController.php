@@ -2,56 +2,30 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\AuthRequest;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use App\Http\Resources\AuthResource;
 
 class LoginController extends Controller
 {
-    public function login(Request $request)
+    public function login(AuthRequest $request)
     {
-        if (!$request->email) {
+        if(Auth::attempt(['email' => $request->email, 'password' => $request->password])){
+
+            $user = new AuthResource(User::where('email', $request->email)->first());
+
+        }else{
+            
             return response()->json([
-                'status'  => 422,
-                'message' => 'email is required'
-            ]);
-        }
-        
-        if(strlen($request->email) < 6) {
-            return response()->json([
-                'status'  => 422,
-                'message' => 'email is invalid'
-            ]);
-        }
-    
-        if (!$request->password) {
-            return response()->json([
-                'status'  => 422,
-                'message' => 'password is required'
-            ]);
-        }
-        if(strlen($request->password) < 8) {
-            return response()->json([
-                'status'  => 422,
-                'message' => 'password is invalid'
-            ]);
-        }
-    
-        $user = User::where('email', $request->email)->first();
-        if (!$user) {
-            return response()->json([
-                'status'  => 404,
-                'message' => 'Model not found.'
-            ]);
-        }
-    
-        if (!Hash::check($request->password, $user->password)) {
-            return response()->json([
-                'status'  => 404,
+                'status' => 404,
                 'message' => 'Invalid credentials'
             ]);
+
         }
-        
+
         return response()->json([
             'user' => $user,
             'token' => $user->createToken('User-Token')->plainTextToken
