@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Services\EmployeeManagement\Applicant;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 
 class JobController extends Controller
 {
@@ -19,7 +20,9 @@ class JobController extends Controller
         $data = $this->applicant->applyJob();
         
         return response()->json([
+            'status' => 200,
             'data' => $data
-        ]);
+        ])
+        ->setStatusCode(Response::HTTP_OK, Response::$statusTexts[Response::HTTP_OK]);
     }
 }

@@ -7,6 +7,7 @@ use App\Models\Post;
 use Illuminate\Http\Request;
 use App\Http\Resources\PostResource;
 use App\Http\Requests\ToggleReactionRequest;
+use Illuminate\Http\Response;
 
 class PostController extends Controller
 {
@@ -15,8 +16,10 @@ class PostController extends Controller
         $data = PostResource::collection(Post::with('author', 'tags')->get());
 
         return response()->json([
+            'status' => 200,
             'data' => $data,
-        ]);
+        ])
+        ->setStatusCode(Response::HTTP_OK, Response::$statusTexts[Response::HTTP_OK]);
     }
     
     public function toggleReaction(ToggleReactionRequest $request)
@@ -24,16 +27,18 @@ class PostController extends Controller
         $post = Post::find($request->post_id);
         if(!$post) {
             return response()->json([
-                'status' => 404,
+                'status' => 400,
                 'message' => 'model not found'
-            ]);
+            ])
+            ->setStatusCode(Response::HTTP_NOT_FOUND, Response::$statusTexts[Response::HTTP_NOT_FOUND]);
         }
 
         if($post->user_id == auth()->id()) {
             return response()->json([
                 'status' => 500,
                 'message' => 'You cannot like your post'
-            ]);
+            ])
+            ->setStatusCode(Response::HTTP_INTERNAL_SERVER_ERROR, Response::$statusTexts[Response::HTTP_INTERNAL_SERVER_ERROR]);
         }
 
         $like = Like::with('likedUser')->where([
@@ -46,7 +51,8 @@ class PostController extends Controller
             return response()->json([
                 'status' => 500,
                 'message' => 'You already liked this post'
-            ]);
+            ])
+            ->setStatusCode(Response::HTTP_INTERNAL_SERVER_ERROR, Response::$statusTexts[Response::HTTP_INTERNAL_SERVER_ERROR]);
 
         }elseif($like && $like->post_id == $request->post_id && !$request->like) {
             
@@ -55,7 +61,8 @@ class PostController extends Controller
             return response()->json([
                 'status' => 200,
                 'message' => 'You unlike this post successfully'
-            ]);
+            ])
+            ->setStatusCode(Response::HTTP_OK, Response::$statusTexts[Response::HTTP_OK]);
 
         }
         
@@ -67,6 +74,7 @@ class PostController extends Controller
         return response()->json([
             'status' => 200,
             'message' => 'You like this post successfully'
-        ]);
+        ])
+        ->setStatusCode(Response::HTTP_OK, Response::$statusTexts[Response::HTTP_OK]);
     }
 }

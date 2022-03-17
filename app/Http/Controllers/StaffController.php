@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Services\EmployeeManagement\Staff;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 
 class StaffController extends Controller
 {
@@ -19,7 +20,9 @@ class StaffController extends Controller
         $data = $this->staff->salary();
     
         return response()->json([
+            'status' => 200,
             'data' => $data
-        ]);
+        ])
+        ->setStatusCode(Response::HTTP_OK, Response::$statusTexts[Response::HTTP_OK]);
     }
 }
